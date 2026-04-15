@@ -4,19 +4,26 @@ on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
-    # استخدام حاوية جاهزة تتجنب خطأ 100 وتدعم Node 24
-    container:
-      image: ghcr.io/kivy/buildozer:master
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Buildozer
+        run: |
+          # تثبيت buildozer محلياً للمستخدم لتجنب قيود النظام
+          pip install --user buildozer
+          # إضافة مسار الأدوات لنظام التشغيل
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
       - name: Build APK
         run: |
-          # نحن الآن داخل بيئة Kivy الرسمية، لا داعي لتثبيت أي شيء
-          # فقط نقوم بالبناء مباشرة
-          buildozer android debug
+          # قبول التراخيص وبدء البناء فوراً
+          yes | buildozer android debug
         env:
           ACCEPT_SDK_LICENSE: "yes"
 
