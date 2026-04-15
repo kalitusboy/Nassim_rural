@@ -9,11 +9,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build with Buildozer
-        # استخدمنا هنا نسخة موثوقة وموجودة دائماً
-        uses: FarasAtWork/buildozer-action@v1
+        # هذه الأداة هي الأكثر استقراراً حالياً لبناء تطبيقات Kivy
+        uses: kivymd/buildozer-action@master
         with:
-          buildozer_version: master
           command: buildozer android debug
+          buildozer_version: master
           repository_root: .
 
       - name: Upload APK Artifact
