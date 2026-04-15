@@ -8,15 +8,28 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Build with Buildozer
-        # هذه الأداة هي الأكثر استقراراً حالياً لبناء تطبيقات Kivy
-        uses: kivymd/buildozer-action@master
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          command: buildozer android debug
-          buildozer_version: master
-          repository_root: .
+          python-version: '3.10'
 
-      - name: Upload APK Artifact
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential ccache git libffi-dev libssl-dev python3-dev
+          sudo apt-get install -y libncurses5 libncursesw5-dev zlib1g-dev zip unzip
+          sudo apt-get install -y autoconf automake libtool
+          python -m pip install --upgrade pip
+          pip install buildozer kivy
+
+      - name: Build with Buildozer
+        run: |
+          # هذه الخطوة ستقوم ببناء الـ APK يدوياً
+          buildozer android debug
+        env:
+          ACCEPT_SDK_LICENSE: "yes"
+
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Census-2026-App
