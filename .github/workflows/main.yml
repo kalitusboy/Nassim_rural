@@ -4,6 +4,9 @@ on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # حل تنبيه Node.js وتوجيه السيرفر لاستخدام النسخة الأحدث
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -15,20 +18,21 @@ jobs:
 
       - name: Install System Dependencies
         run: |
-          sudo apt-get update
+          # حل خطأ 100 عن طريق تحديث المستودعات وإصلاح الحزم المعطلة
+          sudo apt-get update --fix-missing
           sudo apt-get install -y build-essential ccache git libffi-dev libssl-dev python3-dev \
             libncurses5 libncursesw5-dev zlib1g-dev zip unzip autoconf automake libtool \
-            pkg-config libgimpprint-dev python3-pip android-sdk
-          # تحديث pip وتثبيت buildozer
+            pkg-config python3-pip
+          
+          # تثبيت أدوات البناء الأساسية
           python -m pip install --upgrade pip
           pip install buildozer kivy
 
       - name: Build with Buildozer
         run: |
-          # مسح أي إعدادات قديمة والبدء ببناء نظيف
+          # أمر واحد يقوم بكل شيء: قبول التراخيص وبناء التطبيق
           yes | buildozer android debug
         env:
-          # قبول تراخيص أندرويد تلقائياً لتجنب توقف السيرفر
           ACCEPT_SDK_LICENSE: "yes"
 
       - name: Upload APK
@@ -36,4 +40,3 @@ jobs:
         with:
           name: Census-2026-App
           path: bin/*.apk
-          
